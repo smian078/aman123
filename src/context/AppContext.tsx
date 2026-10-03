@@ -284,7 +284,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const res = await googleSignIn();
       if (res?.user && res.user.email) {
         const u = res.user;
-        const userEmail: string = u.email;
+        const userEmail: string = u.email || '';
         const profile: User = {
           id: u.uid,
           name: u.displayName || userEmail.split('@')[0],

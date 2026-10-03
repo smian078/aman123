@@ -41,9 +41,9 @@ app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Real database store for user uploaded documents
 let organizations: Organization[] = [...INITIAL_ORGANIZATIONS];
-let documents: DocumentRecord[] = [];
-let donations: DonationRecord[] = [];
-let auditEvents: AuditEvent[] = [];
+let documents: DocumentRecord[] = [...INITIAL_DOCUMENTS];
+let donations: DonationRecord[] = [INITIAL_DONATION];
+let auditEvents: AuditEvent[] = [...INITIAL_AUDIT_EVENTS];
 
 // Initialize blockchain ledger with seed documents
 async function initializeLedger() {

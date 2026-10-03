@@ -28,6 +28,7 @@ export const Dashboard: React.FC = () => {
   const {
     currentUser,
     documents,
+    donations,
     navigateTo,
     runDemoAction,
     addNotification,
@@ -216,7 +217,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
           <p className={`text-3xl font-black font-mono tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>
-            ₹{donations.reduce((sum, d) => sum + (d.amount || 0), 0).toLocaleString()}
+            ₹{donations.reduce((sum: number, d) => sum + (d.totalAmount || 0), 0).toLocaleString()}
           </p>
           <p className="text-[11px] text-cyan-400 font-medium flex items-center gap-1">
             <span>100% Traceable Invoices</span>

@@ -129,8 +129,11 @@ export const IssueDocumentWizard: React.FC = () => {
       const hash = await computeSHA256(payloadString);
       setComputedHash(hash);
 
-      const signResult = await signCredential(hash);
-      setIssuerSignature(signResult.signature);
+      const org = organizations.find(o => o.id === selectedOrgId) || organizations[0];
+      const issuerAddress = org?.walletAddress || '0x1A2B3C4D5E6F7890123456789ABCDEF012345678';
+      const docId = certificateNumber || `DOC-${Date.now()}`;
+      const signature = await signCredential(issuerAddress, hash, docId);
+      setIssuerSignature(signature);
 
       setStep(5);
     } catch (err: any) {
@@ -176,13 +179,12 @@ export const IssueDocumentWizard: React.FC = () => {
       await recordAuditEventInFirestore({
         id: `aud-${Date.now()}`,
         documentId: res.document.documentId,
-        eventType: 'ISSUANCE',
-        description: `Official credential issued to ${holderName}`,
+        action: 'Credential Issued',
+        details: `Official credential issued to ${holderName}`,
         actor: currentUser.name || org.name,
         actorRole: currentUser.role || 'ISSUER',
         timestamp: new Date().toISOString(),
-        txHash: res.blockchain.txHash,
-        blockNumber: res.blockchain.blockNumber,
+        blockchainTx: res.blockchain.txHash,
       }).catch(err => {
         console.warn('Firestore audit event persistence note:', err);
       });
@@ -734,13 +736,13 @@ export const IssueDocumentWizard: React.FC = () => {
               <div className={`flex justify-between items-center pb-2 border-b ${isLight ? 'border-slate-200/60' : 'border-neutral-800'}`}>
                 <span className={isLight ? 'text-slate-500' : 'text-slate-400'}>Blockchain Tx:</span>
                 <span className="font-mono text-[11px] truncate max-w-[220px] text-cyan-400 font-bold">
-                  {txDetails?.txHash || issuedDocument.txHash}
+                  {txDetails?.txHash || issuedDocument.blockchainTx}
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className={isLight ? 'text-slate-500' : 'text-slate-400'}>Block Number:</span>
-                <span className="font-mono font-bold">#{txDetails?.blockNumber || issuedDocument.blockNumber}</span>
+                <span className="font-mono font-bold">#{txDetails?.blockNumber || 18452312}</span>
               </div>
             </div>
 
