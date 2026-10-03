@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getAuth,
   GoogleAuthProvider,
@@ -23,8 +23,8 @@ import {
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
-// Initialize Firebase App
-export const app = initializeApp(firebaseConfig);
+// Initialize Firebase App safely
+export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // Initialize Firestore Database with specific provisioned databaseId
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);

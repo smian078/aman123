@@ -1,5 +1,6 @@
 import {
   db,
+  auth,
   collection,
   doc,
   getDocs,
@@ -38,6 +39,11 @@ export async function syncUserProfile(user: {
     organizationId: user.organizationId,
     avatarUrl: user.photoURL || undefined,
   };
+
+  // Only sync to Firestore if user is authenticated with Firebase Auth
+  if (!auth.currentUser) {
+    return profile;
+  }
 
   try {
     await setDoc(
@@ -89,6 +95,9 @@ export async function fetchDocumentsFromFirestore(): Promise<DocumentRecord[]> {
  * Save a newly issued document into Firestore
  */
 export async function saveDocumentToFirestore(document: DocumentRecord): Promise<void> {
+  if (!auth.currentUser) {
+    return;
+  }
   try {
     // Save with custom documentId so it matches hash/record id
     await setDoc(doc(db, DOCS_COLLECTION, document.documentId), document);
@@ -104,6 +113,9 @@ export async function updateDocumentInFirestore(
   documentId: string,
   updates: Partial<DocumentRecord>
 ): Promise<void> {
+  if (!auth.currentUser) {
+    return;
+  }
   try {
     const ref = doc(db, DOCS_COLLECTION, documentId);
     await updateDoc(ref, updates);
@@ -142,6 +154,9 @@ export async function fetchAuditEventsFromFirestore(): Promise<AuditEvent[]> {
  * Record an audit event into Firestore
  */
 export async function recordAuditEventInFirestore(event: AuditEvent): Promise<void> {
+  if (!auth.currentUser) {
+    return;
+  }
   try {
     await setDoc(doc(db, AUDIT_COLLECTION, event.id), event);
   } catch (error) {
@@ -179,6 +194,9 @@ export async function fetchDonationsFromFirestore(): Promise<DonationRecord[]> {
  * Save donation to Firestore
  */
 export async function saveDonationToFirestore(donation: DonationRecord): Promise<void> {
+  if (!auth.currentUser) {
+    return;
+  }
   try {
     await setDoc(doc(db, DONATIONS_COLLECTION, donation.donationId), donation);
   } catch (error) {

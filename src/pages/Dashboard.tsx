@@ -41,6 +41,17 @@ export const Dashboard: React.FC = () => {
   const isLight = themeMode === 'light';
   const isOled = themeMode === 'oled';
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 4 && hour < 12) {
+      return 'Good morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good afternoon';
+    } else {
+      return 'Good evening';
+    }
+  };
+
   const handleShare = (doc: DocumentRecord) => {
     const url = `${window.location.origin}/verify/${doc.documentId}`;
     navigator.clipboard.writeText(url);
@@ -68,7 +79,7 @@ export const Dashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              Good morning, {currentUser.name.split(' ')[0]}
+              {getGreeting()}, {currentUser.name.split(' ')[0]}
             </h1>
             <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border ${
               isLight ? 'bg-cyan-100 text-cyan-800 border-cyan-200' : 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'

@@ -251,7 +251,7 @@ export const Navbar: React.FC = () => {
 
             {/* Google Sign In Button */}
             <button
-              onClick={currentUser.email ? logout : loginWithGoogle}
+              onClick={currentUser.email ? () => logout() : () => loginWithGoogle()}
               className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
                 isLight
                   ? 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800 shadow-2xs'

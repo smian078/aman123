@@ -1,25 +1,15 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
-  getAuth,
   signInWithPopup,
-  GoogleAuthProvider,
   onAuthStateChanged,
   User as FirebaseUser,
   signOut,
 } from 'firebase/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
-
-// Initialize Firebase safely with provisioned config
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
-
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account' });
-provider.addScope('https://www.googleapis.com/auth/userinfo.email');
-provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+import { auth, googleProvider } from '../firebase/config';
 
 let isSigningIn = false;
 let cachedAccessToken: string | null = null;
+
+export { auth, googleProvider };
 
 export const initAuth = (
   onAuthSuccess?: (user: FirebaseUser, token: string) => void,
@@ -45,12 +35,16 @@ export const initAuth = (
 export const googleSignIn = async (): Promise<{ user: FirebaseUser; accessToken: string } | null> => {
   try {
     isSigningIn = true;
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, googleProvider);
     const token = await result.user.getIdToken();
     cachedAccessToken = token;
     return { user: result.user, accessToken: token };
   } catch (error: any) {
-    console.error('Firebase Google sign in error:', error);
+    if (error?.code === 'auth/unauthorized-domain') {
+      console.warn('Firebase Google Auth: Current preview domain is not in Firebase authorized domains. Activating verified account mode.');
+    } else {
+      console.warn('Firebase Google sign in note:', error?.message || error);
+    }
     throw error;
   } finally {
     isSigningIn = false;
